@@ -5,16 +5,17 @@
 **Purpose:** Lead generation tool for Dr. Guilherme Leitner's consultation services
 **Target Audience:** Brazilian women, 35-55 years old, upper-class, seeking body transformation
 **Language:** Brazilian Portuguese (all UI/UX)
-**Development Approach:** Ground-up implementation with minimal dependencies
+**Development Approach:** Ground-up implementation with AI Gateway for unified provider management
 **Status:** Starting fresh implementation
 
-## Core Technology Stack (SIMPLIFIED)
+## Core Technology Stack (UPDATED)
 
 ### AI/ML Stack
-- **AI SDK:** Vercel AI SDK 5 (latest stable)
-- **Provider:** @ai-sdk/google for Gemini integration
-- **Model:** Google Gemini 2.0 Flash (fast, cost-effective)
-- **API Key:** Direct Google AI Studio key (already configured)
+- **AI SDK:** Vercel AI SDK 5 (Production-ready, GA)
+- **Gateway:** Vercel AI Gateway (Production-ready, Zero markup pricing)
+- **Primary Model:** Google Gemini 2.5 Pro (vision analysis, multimodal)
+- **Secondary Model:** OpenAI GPT-5 (meal plans, complex reasoning)
+- **Fallback Model:** Gemini 2.5 Flash (fast responses, cost-effective)
 
 ### Frontend Stack (MINIMAL)
 - **Framework:** Next.js 15 with App Router
@@ -50,25 +51,31 @@ Phase 4: Polish & CTAs (Week 4)
 ### Step 1: Basic Next.js Setup
 ```bash
 # Create from scratch (no template)
-npx create-next-app@latest agendador \
+npx create-next-app@latest . \
   --typescript \
   --tailwind \
   --app \
   --no-src-dir \
   --import-alias "@/*"
 
-cd agendador
-
 # Essential packages only
-npm install ai @ai-sdk/google lucide-react
+npm install ai@latest @ai-sdk/ai-gateway @ai-sdk/google @ai-sdk/openai lucide-react
 ```
 
 ### Step 2: Environment Configuration
 ```env
 # .env.local
-GOOGLE_GENERATIVE_AI_API_KEY=your_key_here
+# AI Gateway (unified access, no individual keys needed in production)
+AI_GATEWAY_API_KEY=your_vercel_ai_gateway_key_here
+
+# Direct provider keys (for development/fallback)
+GOOGLE_GENERATIVE_AI_API_KEY=your_google_key_here
+OPENAI_API_KEY=your_openai_key_here
+
+# App Configuration
 NEXT_PUBLIC_APP_NAME="Analisador Corporal IA"
 NEXT_PUBLIC_CALENDLY_URL=https://calendly.com/dr-leitner
+NEXT_PUBLIC_USE_GATEWAY=true
 ```
 
 ### Step 3: Core File Structure
@@ -94,42 +101,99 @@ agendador/
     └── (assets)
 ```
 
-## Simplified AI Integration
+## AI Integration with Gateway & SDK 5
 
-### Direct Gemini Setup (No Gateway)
+### Unified AI Gateway Setup
 ```typescript
 // lib/ai.ts
+import { createAIGateway } from '@ai-sdk/ai-gateway';
 import { google } from '@ai-sdk/google';
+import { openai } from '@ai-sdk/openai';
 
-// Use Gemini Flash for speed and cost
-export const model = google('gemini-2.0-flash-exp', {
-  apiKey: process.env.GOOGLE_GENERATIVE_AI_API_KEY
-});
+const useGateway = process.env.NEXT_PUBLIC_USE_GATEWAY === 'true';
 
-// System prompt for Brazilian context
-export const systemPrompt = `
-Você é um especialista em análise corporal e nutrição.
-Fale sempre em português brasileiro.
-Seja profissional mas acessível.
-Sempre sugira consulta com Dr. Guilherme Leitner quando apropriado.
-`;
+// AI Gateway for production (unified access)
+const gateway = useGateway ? createAIGateway({
+  apiKey: process.env.AI_GATEWAY_API_KEY,
+  baseURL: 'https://ai-gateway.vercel.sh/v1'
+}) : null;
+
+// Model configurations
+export const visionModel = useGateway
+  ? gateway.model('google/gemini-2.5-pro')
+  : google('gemini-2.5-pro', {
+      apiKey: process.env.GOOGLE_GENERATIVE_AI_API_KEY
+    });
+
+export const chatModel = useGateway
+  ? gateway.model('google/gemini-2.5-flash')
+  : google('gemini-2.5-flash', {
+      apiKey: process.env.GOOGLE_GENERATIVE_AI_API_KEY
+    });
+
+export const plannerModel = useGateway
+  ? gateway.model('openai/gpt-5')
+  : openai('gpt-5', {
+      apiKey: process.env.OPENAI_API_KEY
+    });
+
+// System prompts for different contexts
+export const systemPrompts = {
+  chat: `
+    Você é uma nutricionista especializada em análise corporal.
+    Fale sempre em português brasileiro.
+    Seja empática, profissional e motivadora.
+    Sugira consulta com Dr. Guilherme Leitner quando apropriado.
+  `,
+  vision: `
+    Analise a composição corporal nas imagens fornecidas.
+    Identifique: postura, distribuição de gordura, massa muscular aparente.
+    Seja respeitoso e profissional na análise.
+    Forneça insights construtivos e motivadores.
+  `,
+  planner: `
+    Crie planos alimentares detalhados e personalizados.
+    Use alimentos brasileiros comuns.
+    Calcule macros precisamente.
+    Inclua horários e porções específicas.
+    Considere praticidade e custo-benefício.
+  `
+};
 ```
 
-### Minimal Chat Implementation
+### Enhanced Chat Implementation with AI SDK 5
 ```typescript
 // app/api/chat/route.ts
 import { streamText } from 'ai';
-import { model, systemPrompt } from '@/lib/ai';
+import { chatModel, systemPrompts } from '@/lib/ai';
 
 export async function POST(req: Request) {
   const { messages } = await req.json();
 
-  const result = streamText({
-    model,
-    system: systemPrompt,
+  // AI SDK 5 features: type-safe streaming with data parts
+  const result = await streamText({
+    model: chatModel,
+    system: systemPrompts.chat,
     messages,
+    // AI SDK 5: Enhanced tool calling
+    tools: {
+      calculateBMR: {
+        description: 'Calculate Basal Metabolic Rate',
+        parameters: z.object({
+          weight: z.number(),
+          height: z.number(),
+          age: z.number(),
+          gender: z.enum(['male', 'female'])
+        }),
+        execute: async (params) => calculateBMR(params)
+      }
+    },
+    // AI SDK 5: Lifecycle hooks
+    onStart: () => console.log('Chat started'),
+    onComplete: (result) => console.log('Tokens:', result.usage)
   });
 
+  // AI SDK 5: Enhanced data streaming
   return result.toDataStreamResponse();
 }
 ```
@@ -195,32 +259,48 @@ export function Upload({ onUpload }: { onUpload: (files: File[]) => void }) {
 }
 ```
 
-### Direct Gemini Vision
+### Gemini 2.5 Pro Vision Analysis
 ```typescript
 // app/api/analyze/route.ts
+import { generateText } from 'ai';
+import { visionModel, systemPrompts } from '@/lib/ai';
+
 export async function POST(req: Request) {
   const formData = await req.formData();
   const images = formData.getAll('images') as File[];
 
-  // Convert to base64
+  // Convert images for Gemini 2.5 Pro vision
   const imageData = await Promise.all(
     images.map(async (file) => {
       const bytes = await file.arrayBuffer();
       const buffer = Buffer.from(bytes);
       return {
-        mimeType: file.type,
-        data: buffer.toString('base64')
+        type: 'image' as const,
+        image: buffer.toString('base64'),
+        mimeType: file.type
       };
     })
   );
 
+  // Gemini 2.5 Pro multimodal analysis
   const result = await generateText({
-    model,
-    prompt: 'Analyze these body composition images',
-    images: imageData
+    model: visionModel,
+    system: systemPrompts.vision,
+    messages: [{
+      role: 'user',
+      content: [
+        { type: 'text', text: 'Analise detalhadamente estas imagens corporais' },
+        ...imageData
+      ]
+    }],
+    // Gemini 2.5 Pro supports up to 3,600 images
+    maxTokens: 2000
   });
 
-  return Response.json({ analysis: result.text });
+  return Response.json({
+    analysis: result.text,
+    usage: result.usage // Token tracking
+  });
 }
 ```
 
@@ -254,32 +334,56 @@ export const ACTIVITY_LEVELS = {
 };
 ```
 
-## Meal Plan Generation (Structured Output)
+## GPT-5 Meal Plan Generation (Structured Output)
 
 ```typescript
 // lib/meal-plan.ts
-const brazilianFoods = {
-  proteins: ['frango grelhado', 'peixe assado', 'ovos cozidos'],
-  carbs: ['arroz integral', 'batata doce', 'aipim'],
-  vegetables: ['brócolis', 'espinafre', 'tomate'],
-  fruits: ['banana', 'maçã', 'laranja']
-};
+import { generateObject } from 'ai';
+import { plannerModel, systemPrompts } from '@/lib/ai';
+import { z } from 'zod';
+
+const mealPlanSchema = z.object({
+  totalCalories: z.number(),
+  macros: z.object({
+    protein: z.number(),
+    carbs: z.number(),
+    fat: z.number()
+  }),
+  meals: z.array(z.object({
+    name: z.string(),
+    time: z.string(),
+    calories: z.number(),
+    foods: z.array(z.object({
+      item: z.string(),
+      quantity: z.string(),
+      calories: z.number()
+    }))
+  }))
+});
 
 export async function generateMealPlan(
-  calories: number,
+  userData: UserData,
+  tdee: number,
   preferences: string[]
 ) {
-  const prompt = `
-    Crie um plano alimentar brasileiro com ${calories} calorias.
-    Preferências: ${preferences.join(', ')}
-    Use alimentos comuns no Brasil.
-    Formato: JSON com café, almoço, jantar e lanches.
-  `;
-
+  // GPT-5 for complex reasoning and planning
   const result = await generateObject({
-    model,
-    prompt,
-    schema: mealPlanSchema
+    model: plannerModel,
+    system: systemPrompts.planner,
+    prompt: `
+      Crie um plano alimentar detalhado:
+      - Calorias alvo: ${tdee} kcal
+      - Objetivo: ${userData.goal}
+      - Preferências: ${preferences.join(', ')}
+      - Restrições: ${userData.restrictions || 'Nenhuma'}
+
+      Use alimentos brasileiros típicos.
+      Distribua as refeições ao longo do dia.
+      Inclua opções práticas e acessíveis.
+    `,
+    schema: mealPlanSchema,
+    // GPT-5 thinking mode for better planning
+    mode: 'thinking'
   });
 
   return result.object;

@@ -1,4 +1,4 @@
-# Quick Start Guide - Ground-Up Development
+# Quick Start Guide - AI-Powered Body Analyzer
 
 ## 🚀 Day 1: Setup (30 minutes)
 
@@ -13,19 +13,32 @@ npx create-next-app@latest . \
   --import-alias "@/*" \
   --no-install
 
-# Install minimal dependencies
+# Install core dependencies
 npm install next@latest react@latest react-dom@latest
 npm install -D typescript @types/react @types/node tailwindcss postcss autoprefixer
-npm install ai @ai-sdk/google lucide-react
+
+# Install AI SDK 5 and providers
+npm install ai@latest @ai-sdk/ai-gateway @ai-sdk/google @ai-sdk/openai
+
+# Install UI and utilities
+npm install lucide-react zod
 ```
 
 ### 2. Environment Setup
 ```bash
 # Create .env.local
 cat > .env.local << 'EOF'
-GOOGLE_GENERATIVE_AI_API_KEY=your_key_here
+# AI Gateway (recommended for production)
+AI_GATEWAY_API_KEY=your_vercel_gateway_key
+
+# Direct provider keys (for dev/fallback)
+GOOGLE_GENERATIVE_AI_API_KEY=your_google_key
+OPENAI_API_KEY=your_openai_key
+
+# App configuration
 NEXT_PUBLIC_APP_NAME="Analisador Corporal IA"
 NEXT_PUBLIC_CALENDLY_URL=https://calendly.com/dr-leitner
+NEXT_PUBLIC_USE_GATEWAY=true
 EOF
 ```
 
