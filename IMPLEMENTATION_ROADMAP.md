@@ -23,12 +23,14 @@
 - Environment configured
 
 ### Tuesday - AI Integration
-**Goal:** Working chat interface with Gemini
+**Goal:** Working chat interface with Gemini, managed by Vercel AI Gateway
 
 **Morning (3 hours)**
-- [ ] Install AI SDK and Google provider
-- [ ] Configure Gemini 2.0 Flash model
-- [ ] Create chat API endpoint
+- [ ] Install Vercel AI SDK (`npm i ai`)
+- [ ] Configure Vercel AI Gateway in the Vercel dashboard
+- [ ] Instantiate the AI SDK to use the AI Gateway
+- [ ] Configure Gemini 2.5 Flash model as the primary chat model in the gateway
+- [ ] Create chat API endpoint using the AI SDK
 - [ ] Set up streaming response
 
 **Afternoon (2 hours)**
