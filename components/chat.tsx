@@ -1,15 +1,27 @@
 'use client'
 
 import type { UseChatHelpers } from '@ai-sdk/react'
-import { Send, Loader2, Camera } from 'lucide-react'
+import { Send, Loader2, Camera, Utensils } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 import { CTA } from './cta'
+import { MealPlanDisplay } from './meal-plan-display'
+import type { MealPlan } from '@/lib/meal-plan'
 
 interface ChatProps {
   chat: Pick<UseChatHelpers, 'messages' | 'append' | 'isLoading'>
+  mealPlan: MealPlan | null
+  onRequestMealPlan: () => void
+  isGeneratingMealPlan: boolean
+  hasUserData: boolean
 }
 
-export function Chat({ chat }: ChatProps) {
+export function Chat({
+  chat,
+  mealPlan,
+  onRequestMealPlan,
+  isGeneratingMealPlan,
+  hasUserData
+}: ChatProps) {
   const { messages, append, isLoading } = chat
   const [input, setInput] = useState('')
 
@@ -84,6 +96,26 @@ export function Chat({ chat }: ChatProps) {
         )}
 
         {showCTA && <CTA />}
+
+        {/* Meal Plan Display */}
+        {mealPlan && <MealPlanDisplay mealPlan={mealPlan} />}
+
+        {/* Meal Plan Generation Loading */}
+        {isGeneratingMealPlan && (
+          <div className="bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-lg p-6">
+            <div className="flex items-center gap-3">
+              <Loader2 className="w-6 h-6 animate-spin text-green-600" />
+              <div>
+                <h3 className="font-semibold text-green-900">
+                  Gerando seu plano alimentar personalizado...
+                </h3>
+                <p className="text-sm text-green-700">
+                  Estamos criando um plano adaptado aos seus objetivos e necessidades.
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Input Area */}
@@ -91,6 +123,21 @@ export function Chat({ chat }: ChatProps) {
         onSubmit={handleSubmit}
         className="border-t border-gray-200 bg-white p-4"
       >
+        {/* Meal Plan Request Button */}
+        {hasUserData && !mealPlan && messages.length >= 2 && (
+          <div className="mb-3">
+            <button
+              type="button"
+              onClick={onRequestMealPlan}
+              disabled={isGeneratingMealPlan}
+              className="w-full bg-gradient-to-r from-green-600 to-emerald-600 text-white py-3 px-4 rounded-lg font-semibold hover:from-green-700 hover:to-emerald-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+            >
+              <Utensils className="w-5 h-5" />
+              {isGeneratingMealPlan ? 'Gerando plano alimentar...' : 'Gerar Plano Alimentar Personalizado'}
+            </button>
+          </div>
+        )}
+
         <div className="flex gap-2">
           <input
             ref={fileInputRef}

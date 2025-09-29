@@ -6,6 +6,7 @@ import { MetricsSummary } from '@/components/metrics-summary'
 import { PrivacyNotice } from '@/components/privacy-notice'
 import { UserIntake } from '@/components/user-intake'
 import type { MetricsResult, UserMetricsInput } from '@/lib/calculations'
+import type { MealPlan } from '@/lib/meal-plan'
 import { useChat } from '@ai-sdk/react'
 import { useState } from 'react'
 
@@ -14,6 +15,8 @@ export default function Home() {
   const chat = useChat({ api: '/api/chat' })
   const [metrics, setMetrics] = useState<MetricsResult | null>(null)
   const [userInput, setUserInput] = useState<UserMetricsInput | null>(null)
+  const [mealPlan, setMealPlan] = useState<MealPlan | null>(null)
+  const [isGeneratingMealPlan, setIsGeneratingMealPlan] = useState(false)
 
   const handleIntakeSubmit = (payload: {
     input: UserMetricsInput
@@ -26,6 +29,40 @@ export default function Home() {
     chat.append({ role: 'user', content: message })
   }
 
+  const handleMealPlanRequest = async () => {
+    if (!userInput || !metrics) {
+      alert('Por favor, preencha seus dados pessoais primeiro.')
+      return
+    }
+
+    setIsGeneratingMealPlan(true)
+
+    try {
+      const response = await fetch('/api/meal-plan', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          userInput,
+          metrics,
+          preferences: [],
+          restrictions: []
+        })
+      })
+
+      if (!response.ok) {
+        throw new Error('Falha ao gerar plano alimentar')
+      }
+
+      const data = await response.json()
+      setMealPlan(data.mealPlan)
+    } catch (error) {
+      console.error('Error requesting meal plan:', error)
+      alert('Erro ao gerar plano alimentar. Tente novamente.')
+    } finally {
+      setIsGeneratingMealPlan(false)
+    }
+  }
+
   if (!acceptedPrivacy) {
     return <PrivacyNotice onAccept={() => setAcceptedPrivacy(true)} />
   }
@@ -36,11 +73,19 @@ export default function Home() {
       <div className="mx-auto flex w-full max-w-6xl flex-1 flex-col gap-6 px-4 py-6 lg:flex-row">
         <div className="w-full lg:w-[360px] lg:shrink-0">
           <UserIntake onSubmit={handleIntakeSubmit} />
-          {metrics && userInput && <MetricsSummary input={userInput} summary={metrics} />}
+          {metrics && userInput && (
+            <MetricsSummary input={userInput} summary={metrics} />
+          )}
         </div>
 
         <div className="flex-1 min-h-[520px]">
-          <Chat chat={chat} />
+          <Chat
+            chat={chat}
+            mealPlan={mealPlan}
+            onRequestMealPlan={handleMealPlanRequest}
+            isGeneratingMealPlan={isGeneratingMealPlan}
+            hasUserData={!!userInput && !!metrics}
+          />
         </div>
       </div>
     </main>
