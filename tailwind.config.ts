@@ -24,6 +24,8 @@ const config: Config = {
         success: '#16a34a',
         warning: '#eab308',
         danger: '#dc2626',
+        border: 'hsl(var(--border))',
+        foreground: 'hsl(var(--foreground))',
       },
       animation: {
         'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',

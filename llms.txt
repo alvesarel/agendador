@@ -1,0 +1,3 @@
+I have received the content from `https://ai-sdk.dev/llms.txt`.
+
+What would you like me to do with this content?

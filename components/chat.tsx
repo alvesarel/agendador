@@ -1,14 +1,27 @@
 'use client'
 
-import { useChat } from 'ai/react'
+import { useChat } from '@ai-sdk/react'
 import { Send, Loader2, Camera } from 'lucide-react'
 import { useRef, useState } from 'react'
 import { CTA } from './cta'
 
 export function Chat() {
-  const { messages, input, handleInputChange, handleSubmit, isLoading } = useChat({
+  const { messages, append, isLoading } = useChat({
     api: '/api/chat',
   })
+  const [input, setInput] = useState('')
+
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
+    if (!input.trim()) return
+    append({ role: 'user', content: input })
+    setInput('')
+  }
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setInput(e.target.value)
+  }
+
   const [showCTA, setShowCTA] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
 

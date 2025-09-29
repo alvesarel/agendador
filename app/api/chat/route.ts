@@ -12,10 +12,10 @@ export async function POST(req: Request) {
       system: systemPrompts.chat,
       messages,
       temperature: 0.7,
-      maxTokens: 1000,
+      maxOutputTokens: 1000,
     })
 
-    return result.toDataStreamResponse()
+    return result.toTextStreamResponse()
   } catch (error) {
     console.error('Chat API error:', error)
     return new Response('Erro ao processar mensagem', { status: 500 })

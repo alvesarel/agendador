@@ -1,4 +1,4 @@
-import { createAIGateway } from '@ai-sdk/ai-gateway'
+import { createGateway } from 'ai'
 import { google } from '@ai-sdk/google'
 import { openai } from '@ai-sdk/openai'
 
@@ -6,7 +6,7 @@ import { openai } from '@ai-sdk/openai'
 const useGateway = process.env.NEXT_PUBLIC_USE_GATEWAY === 'true' && process.env.AI_GATEWAY_API_KEY
 
 // Initialize AI Gateway if configured
-const gateway = useGateway ? createAIGateway({
+const gateway = useGateway ? createGateway({
   apiKey: process.env.AI_GATEWAY_API_KEY!,
   baseURL: 'https://ai-gateway.vercel.sh/v1'
 }) : null

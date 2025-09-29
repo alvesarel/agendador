@@ -11,7 +11,8 @@
   "dependencies": {
     "@ai-sdk/google": "latest",
     "@ai-sdk/openai": "latest",
-    "ai": "^5.0.0",
+    "@ai-sdk/react": "^2.0.56",
+    "ai": "3.0.0",
     "lucide-react": "latest",
     "next": "^15.5.4",
     "react": "19.0.0-rc-65a56d0e-20241020",
