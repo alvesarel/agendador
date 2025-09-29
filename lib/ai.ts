@@ -2,15 +2,15 @@ import { google } from '@ai-sdk/google'
 import { openai } from '@ai-sdk/openai'
 
 // Model configurations using direct provider imports
-export const visionModel = google('gemini-2.0-flash-exp', {
+export const visionModel = google('gemini-2.5-flash', {
   apiKey: process.env.GOOGLE_GENERATIVE_AI_API_KEY
 })
 
-export const chatModel = google('gemini-2.0-flash-exp', {
+export const chatModel = google('gemini-2.5-flash', {
   apiKey: process.env.GOOGLE_GENERATIVE_AI_API_KEY
 })
 
-export const plannerModel = openai('gpt-4o', {
+export const plannerModel = openai('gpt-5', {
   apiKey: process.env.OPENAI_API_KEY
 })
 
