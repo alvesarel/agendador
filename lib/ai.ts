@@ -1,17 +1,18 @@
-import { createGateway } from 'ai'
+import { google } from '@ai-sdk/google'
+import { openai } from '@ai-sdk/openai'
 
-if (!process.env.AI_GATEWAY_API_KEY) {
-  throw new Error('Missing AI_GATEWAY_API_KEY environment variable.')
-}
-
-const gateway = createGateway({
-  apiKey: process.env.AI_GATEWAY_API_KEY,
+// Model configurations using direct provider imports
+export const visionModel = google('gemini-2.0-flash-exp', {
+  apiKey: process.env.GOOGLE_GENERATIVE_AI_API_KEY
 })
 
-// Model configurations routed exclusively through the AI Gateway
-export const visionModel = gateway('google/gemini-2.5-pro')
-export const chatModel = gateway('google/gemini-2.5-flash')
-export const plannerModel = gateway('openai/gpt-5')
+export const chatModel = google('gemini-2.0-flash-exp', {
+  apiKey: process.env.GOOGLE_GENERATIVE_AI_API_KEY
+})
+
+export const plannerModel = openai('gpt-4o', {
+  apiKey: process.env.OPENAI_API_KEY
+})
 
 // System prompts for different contexts
 export const systemPrompts = {
