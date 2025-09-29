@@ -1,18 +1,29 @@
 import { google } from '@ai-sdk/google'
 import { openai } from '@ai-sdk/openai'
 
-// Model configurations using direct provider imports
-export const visionModel = google('gemini-2.5-flash', {
-  apiKey: process.env.GEMINI_API_KEY
-})
+// AI SDK 5 uses AI Gateway by default when using model strings
+// Falls back to direct provider instances if AI_GATEWAY_API_KEY is not set
 
-export const chatModel = google('gemini-2.5-flash', {
-  apiKey: process.env.GEMINI_API_KEY
-})
+const useGateway = !!process.env.AI_GATEWAY_API_KEY
 
-export const plannerModel = openai('gpt-5', {
-  apiKey: process.env.OPENAI_API_KEY
-})
+// Model configurations: AI Gateway (primary) with direct provider fallback
+export const visionModel = useGateway
+  ? 'google/gemini-2.5-flash'
+  : google('gemini-2.5-flash', {
+      apiKey: process.env.GEMINI_API_KEY
+    })
+
+export const chatModel = useGateway
+  ? 'google/gemini-2.5-flash'
+  : google('gemini-2.5-flash', {
+      apiKey: process.env.GEMINI_API_KEY
+    })
+
+export const plannerModel = useGateway
+  ? 'openai/gpt-5'
+  : openai('gpt-5', {
+      apiKey: process.env.OPENAI_API_KEY
+    })
 
 // System prompts for different contexts
 export const systemPrompts = {
