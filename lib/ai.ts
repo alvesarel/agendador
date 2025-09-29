@@ -1,18 +1,17 @@
-import { createAIGateway } from '@ai-sdk/ai-gateway'
+import { createGateway } from 'ai'
 
 if (!process.env.AI_GATEWAY_API_KEY) {
   throw new Error('Missing AI_GATEWAY_API_KEY environment variable.')
 }
 
-const gateway = createAIGateway({
+const gateway = createGateway({
   apiKey: process.env.AI_GATEWAY_API_KEY,
-  baseURL: 'https://ai-gateway.vercel.sh/v1'
 })
 
 // Model configurations routed exclusively through the AI Gateway
-export const visionModel = gateway.model('google/gemini-2.5-pro')
-export const chatModel = gateway.model('google/gemini-2.5-flash')
-export const plannerModel = gateway.model('openai/gpt-5')
+export const visionModel = gateway('google/gemini-2.5-pro')
+export const chatModel = gateway('google/gemini-2.5-flash')
+export const plannerModel = gateway('openai/gpt-5')
 
 // System prompts for different contexts
 export const systemPrompts = {
