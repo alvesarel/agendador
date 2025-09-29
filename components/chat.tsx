@@ -1,14 +1,16 @@
 'use client'
 
-import { useChat } from '@ai-sdk/react'
+import type { UseChatHelpers } from '@ai-sdk/react'
 import { Send, Loader2, Camera } from 'lucide-react'
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { CTA } from './cta'
 
-export function Chat() {
-  const { messages, append, isLoading } = useChat({
-    api: '/api/chat',
-  })
+interface ChatProps {
+  chat: Pick<UseChatHelpers, 'messages' | 'append' | 'isLoading'>
+}
+
+export function Chat({ chat }: ChatProps) {
+  const { messages, append, isLoading } = chat
   const [input, setInput] = useState('')
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
@@ -25,10 +27,11 @@ export function Chat() {
   const [showCTA, setShowCTA] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
-  // Show CTA after 5 messages
-  if (messages.length > 5 && !showCTA) {
-    setShowCTA(true)
-  }
+  useEffect(() => {
+    if (messages.length > 5) {
+      setShowCTA(true)
+    }
+  }, [messages.length])
 
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files

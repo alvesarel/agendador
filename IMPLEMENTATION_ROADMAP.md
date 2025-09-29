@@ -2,6 +2,8 @@
 
 ## Week 1: Foundation & MVP
 
+> **Critical path:** All AI interactions must run through Vercel AI Gateway, and the end-to-end meal plan experience (calculations + GPT-5 plan) must ship by Friday.
+
 ### Monday - Project Setup
 **Goal:** Working Next.js application with basic structure
 
@@ -65,7 +67,7 @@
 - Results display
 
 ### Thursday - Meal Plan Generation
-**Goal:** AI-generated meal plans with Brazilian foods
+**Goal:** AI-generated meal plans with Brazilian foods (MVP-critical)
 
 **Morning (3 hours)**
 - [ ] Create Brazilian foods database
@@ -79,9 +81,9 @@
 - [ ] Add meal timing suggestions
 
 **Deliverables:**
-- Personalized meal plans
+- Personalized meal plans (GPT-5 via AI Gateway)
 - Brazilian food focus
-- Macro calculations
+- Macro calculations surfaced in chat
 
 ### Friday - CTAs & Conversion
 **Goal:** Strategic conversion points

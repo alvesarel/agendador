@@ -40,10 +40,10 @@
 
 ### Progressive Enhancement
 ```
-Phase 1: Text chat with AI (Week 1)
+Phase 1: Text chat + calculations + meal plans (Week 1)
 Phase 2: Image upload/analysis (Week 2)
-Phase 3: Meal plans & calculations (Week 3)
-Phase 4: Polish & CTAs (Week 4)
+Phase 3: Mobile polish & CTAs (Week 2)
+Phase 4: Optimization & growth (Week 3+)
 ```
 
 ## Ground-Up Implementation Plan
@@ -65,17 +65,12 @@ npm install ai@latest @ai-sdk/ai-gateway @ai-sdk/google @ai-sdk/openai lucide-re
 ### Step 2: Environment Configuration
 ```env
 # .env.local
-# AI Gateway (unified access, no individual keys needed in production)
+# AI Gateway (unified access, required in all environments)
 AI_GATEWAY_API_KEY=your_vercel_ai_gateway_key_here
-
-# Direct provider keys (for development/fallback)
-GOOGLE_GENERATIVE_AI_API_KEY=your_google_key_here
-OPENAI_API_KEY=your_openai_key_here
 
 # App Configuration
 NEXT_PUBLIC_APP_NAME="Analisador Corporal IA"
 NEXT_PUBLIC_CALENDLY_URL=https://calendly.com/dr-leitner
-NEXT_PUBLIC_USE_GATEWAY=true
 ```
 
 ### Step 3: Core File Structure
@@ -103,39 +98,35 @@ agendador/
 
 ## AI Integration with Gateway & SDK 5
 
+### Vercel AI Gateway Reference
+- **Unified routing:** Single endpoint (`https://ai-gateway.vercel.sh/v1`) for hundreds of models with automatic failover and load balancing.
+- **Credits & pricing:** Zero markup; purchase credits in the Vercel dashboard. Free tier grants $5/month after the first request before upgrading to pay-as-you-go.
+- **Budgets & monitoring:** Built-in dashboards surface request volume, latency, and spend per model so we can enforce limits and spot regressions quickly.
+- **Authentication:** Prefer permanent API keys stored in `AI_GATEWAY_API_KEY`. When linked to Vercel, we can alternatively pull short-lived OIDC tokens via `vercel env pull` during local dev.
+- **Bring-your-own-key:** Not needed for our flow, but the gateway supports BYOK if we ever need provider-specific credentials routed through Vercel.
+
+### AI SDK 5 Reference
+- **Type-safe chat:** Distinct `UIMessage` vs `ModelMessage` flows keep persistence clean and typed across server/client.
+- **Data parts:** Stream custom status updates (analysis progress, CTA triggers) without polluting chat history; leverage transient parts for non-persistent notifications.
+- **Agentic loop control:** Fine-grained control over tool retries and multi-step reasoning loops pairs well with GPT-5 meal planning.
+- **Tool improvements:** Tool calls emit typed part identifiers (`tool-yourTool`) and stream both inputs and outputs, enabling rich UI states for calculations.
+- **Raw response access & Zod v4:** We can inspect provider-native payloads when debugging and keep structured outputs validated through the latest Zod release.
+
 ### Unified AI Gateway Setup
 ```typescript
 // lib/ai.ts
 import { createAIGateway } from '@ai-sdk/ai-gateway';
-import { google } from '@ai-sdk/google';
-import { openai } from '@ai-sdk/openai';
 
-const useGateway = process.env.NEXT_PUBLIC_USE_GATEWAY === 'true';
-
-// AI Gateway for production (unified access)
-const gateway = useGateway ? createAIGateway({
+// AI Gateway provides the primary (and only) integration path
+const gateway = createAIGateway({
   apiKey: process.env.AI_GATEWAY_API_KEY,
   baseURL: 'https://ai-gateway.vercel.sh/v1'
-}) : null;
+});
 
-// Model configurations
-export const visionModel = useGateway
-  ? gateway.model('google/gemini-2.5-pro')
-  : google('gemini-2.5-pro', {
-      apiKey: process.env.GOOGLE_GENERATIVE_AI_API_KEY
-    });
-
-export const chatModel = useGateway
-  ? gateway.model('google/gemini-2.5-flash')
-  : google('gemini-2.5-flash', {
-      apiKey: process.env.GOOGLE_GENERATIVE_AI_API_KEY
-    });
-
-export const plannerModel = useGateway
-  ? gateway.model('openai/gpt-5')
-  : openai('gpt-5', {
-      apiKey: process.env.OPENAI_API_KEY
-    });
+// Model configurations via the gateway
+export const visionModel = gateway.model('google/gemini-2.5-pro');
+export const chatModel = gateway.model('google/gemini-2.5-flash');
+export const plannerModel = gateway.model('openai/gpt-5');
 
 // System prompts for different contexts
 export const systemPrompts = {
@@ -434,12 +425,12 @@ export function shouldShowCTA(context: {
 # 4. Test with Portuguese prompts
 ```
 
-### Day 5-6: Features
+### Day 5-6: Features (Meal Plan required by Day 5)
 ```bash
-# 1. Add image upload
-# 2. Implement BMR/TDEE calculations
-# 3. Create meal plan generation
-# 4. Add strategic CTAs
+# 1. Implement BMR/TDEE calculations
+# 2. Create GPT-5 meal plan generation via gateway
+# 3. Integrate plans into chat experience (Day 5 milestone)
+# 4. Add strategic CTAs (start Day 6)
 ```
 
 ### Day 7: Polish & Deploy

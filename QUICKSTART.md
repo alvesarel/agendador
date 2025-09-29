@@ -28,19 +28,16 @@ npm install lucide-react zod
 ```bash
 # Create .env.local
 cat > .env.local << 'EOF'
-# AI Gateway (recommended for production)
+# AI Gateway (required in all environments)
 AI_GATEWAY_API_KEY=your_vercel_gateway_key
-
-# Direct provider keys (for dev/fallback)
-GOOGLE_GENERATIVE_AI_API_KEY=your_google_key
-OPENAI_API_KEY=your_openai_key
 
 # App configuration
 NEXT_PUBLIC_APP_NAME="Analisador Corporal IA"
 NEXT_PUBLIC_CALENDLY_URL=https://calendly.com/dr-leitner
-NEXT_PUBLIC_USE_GATEWAY=true
 EOF
 ```
+
+> 🔐 Get your gateway key in the Vercel dashboard: AI Gateway tab → API Keys → **Create key** → copy the value into `AI_GATEWAY_API_KEY`. The gateway dashboard also shows credits, budgets, and model pricing.
 
 ### 3. Clean Project
 ```bash
@@ -98,14 +95,19 @@ export default function Home() {
 
 ## 🤖 Day 3: AI Integration (2 hours)
 
-### 1. Configure AI
+### 1. Configure AI Gateway & Models
 ```typescript
 // lib/ai.ts
-import { google } from '@ai-sdk/google'
+import { createAIGateway } from '@ai-sdk/ai-gateway'
 
-export const model = google('gemini-2.0-flash-exp', {
-  apiKey: process.env.GOOGLE_GENERATIVE_AI_API_KEY
+const gateway = createAIGateway({
+  apiKey: process.env.AI_GATEWAY_API_KEY!,
 })
+
+// Primary models routed through Vercel AI Gateway
+export const chatModel = gateway.model('google/gemini-2.5-flash')
+export const plannerModel = gateway.model('openai/gpt-5')
+export const visionModel = gateway.model('google/gemini-2.5-pro')
 
 export const systemPrompt = `
 Você é uma nutricionista especializada em análise corporal.
@@ -119,13 +121,13 @@ Quando apropriado, sugira consulta com Dr. Guilherme Leitner.
 ```typescript
 // app/api/chat/route.ts
 import { streamText } from 'ai'
-import { model, systemPrompt } from '@/lib/ai'
+import { chatModel, systemPrompt } from '@/lib/ai'
 
 export async function POST(req: Request) {
   const { messages } = await req.json()
 
   const result = streamText({
-    model,
+    model: chatModel,
     system: systemPrompt,
     messages,
   })
@@ -233,7 +235,7 @@ module.exports = {
 }
 ```
 
-## 🧮 Day 5: Calculations (2 hours)
+## 🧮 Day 5: Calculations & Meal Plan (3 hours)
 
 ### 1. BMR/TDEE Functions
 ```typescript
@@ -268,7 +270,7 @@ export function calculateMacros(tdee: number) {
 }
 ```
 
-### 2. Integration with Chat
+### 2. Integration with Chat & Meal Plan Generation
 ```typescript
 // Add to system prompt in lib/ai.ts
 export const systemPrompt = `
@@ -288,6 +290,44 @@ Níveis de atividade:
 - Muito ativo: 1.725
 `
 ```
+
+```typescript
+// lib/meal-plan.ts
+import { generateObject } from 'ai'
+import { plannerModel } from '@/lib/ai'
+import { z } from 'zod'
+
+const mealPlanSchema = z.object({
+  totalCalories: z.number(),
+  macros: z.object({
+    protein: z.number(),
+    carbs: z.number(),
+    fat: z.number()
+  }),
+  meals: z.array(z.object({
+    name: z.string(),
+    time: z.string(),
+    calories: z.number(),
+    foods: z.array(z.object({
+      item: z.string(),
+      quantity: z.string(),
+      calories: z.number()
+    }))
+  }))
+})
+
+export async function generateMealPlan(prompt: string) {
+  const result = await generateObject({
+    model: plannerModel,
+    prompt,
+    schema: mealPlanSchema,
+  })
+
+  return result.object
+}
+```
+
+> ✅ Ship the meal plan experience by end of Day 5. It is required for the MVP and should be demo-ready alongside the calculations.
 
 ## 📸 Day 6: Image Upload (Optional - 3 hours)
 
@@ -467,16 +507,15 @@ vercel --prod
 
 **Chat not responding:**
 ```bash
-# Check API key
-echo $GOOGLE_GENERATIVE_AI_API_KEY
+# Check AI Gateway key
+echo $AI_GATEWAY_API_KEY
 # Check console for errors
 # Verify API endpoint
 ```
 
 **Slow responses:**
-```typescript
-// Switch to Flash model
-model = google('gemini-2.0-flash-exp')
+```text
+// Verify gateway configuration and quotas in Vercel dashboard
 ```
 
 **Build errors:**
@@ -489,3 +528,11 @@ npm run build
 ---
 
 Ready to build! Start with Day 1 and iterate daily. Focus on shipping, not perfection.
+
+## 📚 Reference: Vercel AI Gateway & AI SDK 5
+
+- **Gateway basics:** unified endpoint (`https://ai-gateway.vercel.sh/v1`) covering hundreds of models, automatic provider failover, spend monitoring, and budget controls with zero markup pricing (credits purchased through the Vercel dashboard).
+- **Authentication:** use the `AI_GATEWAY_API_KEY` generated in the AI Gateway tab, or link the project to Vercel and pull an OIDC token via `vercel env pull` for short-lived automated auth.
+- **Observability:** the dashboard exposes per-model usage, latency, and error metrics so you can tune routing and enforce limits.
+- **AI SDK 5 highlights:** redesigned `useChat` with type-safe UI/model messages, data parts for streaming structured updates, agentic loop control, and first-class tool invocation with typed inputs/outputs.
+- **Structured outputs:** combine `generateObject` with Zod schemas to keep GPT-5 meal plans typed end-to-end; use data parts to stream progress indicators back to the chat UI.

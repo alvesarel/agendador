@@ -1,34 +1,18 @@
-import { createGateway } from 'ai'
-import { google } from '@ai-sdk/google'
-import { openai } from '@ai-sdk/openai'
+import { createAIGateway } from '@ai-sdk/ai-gateway'
 
-// Check if we should use AI Gateway or direct providers
-const useGateway = process.env.NEXT_PUBLIC_USE_GATEWAY === 'true' && process.env.AI_GATEWAY_API_KEY
+if (!process.env.AI_GATEWAY_API_KEY) {
+  throw new Error('Missing AI_GATEWAY_API_KEY environment variable.')
+}
 
-// Initialize AI Gateway if configured
-const gateway = useGateway ? createGateway({
-  apiKey: process.env.AI_GATEWAY_API_KEY!,
+const gateway = createAIGateway({
+  apiKey: process.env.AI_GATEWAY_API_KEY,
   baseURL: 'https://ai-gateway.vercel.sh/v1'
-}) : null
+})
 
-// Model configurations with fallback to direct providers
-export const visionModel = useGateway && gateway
-  ? gateway.model('google/gemini-2.5-pro')
-  : google('gemini-2.5-pro', {
-      apiKey: process.env.GOOGLE_GENERATIVE_AI_API_KEY!
-    })
-
-export const chatModel = useGateway && gateway
-  ? gateway.model('google/gemini-2.5-flash')
-  : google('gemini-2.5-flash', {
-      apiKey: process.env.GOOGLE_GENERATIVE_AI_API_KEY!
-    })
-
-export const plannerModel = useGateway && gateway
-  ? gateway.model('openai/gpt-5')
-  : openai('gpt-5', {
-      apiKey: process.env.OPENAI_API_KEY!
-    })
+// Model configurations routed exclusively through the AI Gateway
+export const visionModel = gateway.model('google/gemini-2.5-pro')
+export const chatModel = gateway.model('google/gemini-2.5-flash')
+export const plannerModel = gateway.model('openai/gpt-5')
 
 // System prompts for different contexts
 export const systemPrompts = {

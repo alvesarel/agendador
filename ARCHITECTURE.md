@@ -30,7 +30,7 @@ Use **Vercel AI Gateway** with **AI SDK 5** for unified provider management:
    - **GPT-5**: Complex meal planning (94.6% AIME 2025)
    - **Gemini 2.5 Flash**: Fast chat responses (cost-effective)
 
-3. **Fallback Strategy**: Direct provider keys for development
+3. **Fallback Strategy**: Use alternate models via Gateway routing
 
 ### Consequences
 ✅ Simplified API management
@@ -238,12 +238,12 @@ Environment-based configuration:
 ```typescript
 const config = {
   development: {
-    useGateway: false,  // Direct provider keys
+    useGateway: true,  // Always route through AI Gateway
     debug: true,
     mockData: true
   },
   production: {
-    useGateway: true,  // AI Gateway
+    useGateway: true,  // AI Gateway enforced
     debug: false,
     mockData: false
   }
