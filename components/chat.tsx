@@ -1,14 +1,24 @@
 'use client'
 
-import type { UseChatHelpers } from '@ai-sdk/react'
 import { Send, Loader2, Camera, Utensils } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 import { CTA } from './cta'
 import { MealPlanDisplay } from './meal-plan-display'
 import type { MealPlan } from '@/lib/meal-plan'
 
+// AI SDK 5 useChat return type
+interface ChatHelpers {
+  messages: Array<{
+    id: string
+    role: 'user' | 'assistant' | 'system'
+    content: string
+  }>
+  sendMessage: (message: string) => void
+  status: 'ready' | 'submitted' | 'streaming' | 'error'
+}
+
 interface ChatProps {
-  chat: Pick<UseChatHelpers, 'messages' | 'append' | 'isLoading'>
+  chat: ChatHelpers
   mealPlan: MealPlan | null
   onRequestMealPlan: () => void
   isGeneratingMealPlan: boolean
@@ -22,13 +32,14 @@ export function Chat({
   isGeneratingMealPlan,
   hasUserData
 }: ChatProps) {
-  const { messages, append, isLoading } = chat
+  const { messages, sendMessage, status } = chat
   const [input, setInput] = useState('')
+  const isLoading = status === 'submitted' || status === 'streaming'
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     if (!input.trim()) return
-    append({ role: 'user', content: input })
+    sendMessage(input)
     setInput('')
   }
 

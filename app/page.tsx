@@ -26,7 +26,7 @@ export default function Home() {
     setMetrics(payload.summary)
 
     const message = buildIntakeMessage(payload.input, payload.summary)
-    chat.sendMessage({ role: 'user', content: message })
+    chat.sendMessage(message)
   }
 
   const handleMealPlanRequest = async () => {
