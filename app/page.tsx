@@ -68,15 +68,20 @@ export default function Home() {
 
       const data = await response.json()
       console.log('[Frontend] Full response data:', JSON.stringify(data, null, 2))
+      console.log('[Frontend] Response keys:', Object.keys(data))
       console.log('[Frontend] Analysis field:', {
         exists: 'analysis' in data,
         type: typeof data.analysis,
-        value: data.analysis
+        value: data.analysis,
+        isNull: data.analysis === null,
+        isUndefined: data.analysis === undefined,
+        isEmpty: data.analysis === ''
       })
 
       if (!data.analysis || typeof data.analysis !== 'string' || data.analysis.trim().length === 0) {
         console.error('[Frontend] Invalid analysis data - full response:', JSON.stringify(data, null, 2))
-        throw new Error('Resposta da API não contém análise válida')
+        const debugInfo = `Response keys: ${Object.keys(data).join(', ')}\nAnalysis value: ${JSON.stringify(data.analysis)}`
+        throw new Error(`Resposta da API não contém análise válida.\n\nDebug info:\n${debugInfo}`)
       }
 
       console.log('[Frontend] Valid analysis received, length:', data.analysis.length)
