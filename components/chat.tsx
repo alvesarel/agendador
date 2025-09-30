@@ -8,7 +8,7 @@ import { MealPlanDisplay } from './meal-plan-display'
 import type { MealPlan } from '@/lib/meal-plan'
 
 interface ChatProps {
-  chat: UseChatHelpers
+  chat: UseChatHelpers<any>
   mealPlan: MealPlan | null
   onRequestMealPlan: () => void
   isGeneratingMealPlan: boolean
