@@ -21,29 +21,29 @@ export async function POST(req: Request) {
       goalPhotosCount: goalPhotos.length
     })
 
-    // Convert images to base64 for Gemini 2.5 Pro
-    console.log('[Analyze API] Converting current photos to base64...')
+    // Convert images to Buffer format for Gemini 2.5 Pro
+    console.log('[Analyze API] Converting current photos...')
     const currentImageData = await Promise.all(
       currentPhotos.map(async (file) => {
         const bytes = await file.arrayBuffer()
         const buffer = Buffer.from(bytes)
         return {
-          type: 'image' as const,
-          image: buffer.toString('base64'),
-          mimeType: file.type
+          type: 'file' as const,
+          data: buffer,
+          mimeType: file.type || 'image/jpeg'
         }
       })
     )
 
-    console.log('[Analyze API] Converting goal photos to base64...')
+    console.log('[Analyze API] Converting goal photos...')
     const goalImageData = await Promise.all(
       goalPhotos.map(async (file) => {
         const bytes = await file.arrayBuffer()
         const buffer = Buffer.from(bytes)
         return {
-          type: 'image' as const,
-          image: buffer.toString('base64'),
-          mimeType: file.type
+          type: 'file' as const,
+          data: buffer,
+          mimeType: file.type || 'image/jpeg'
         }
       })
     )
