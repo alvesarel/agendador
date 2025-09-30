@@ -12,7 +12,7 @@ import { useState } from 'react'
 
 export default function Home() {
   const [acceptedPrivacy, setAcceptedPrivacy] = useState(false)
-  const chat = useChat({ api: '/api/chat' })
+  const chat = useChat()
   const [metrics, setMetrics] = useState<MetricsResult | null>(null)
   const [userInput, setUserInput] = useState<UserMetricsInput | null>(null)
   const [mealPlan, setMealPlan] = useState<MealPlan | null>(null)
