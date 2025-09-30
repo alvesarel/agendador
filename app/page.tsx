@@ -26,7 +26,8 @@ export default function Home() {
     setMetrics(payload.summary)
 
     const message = buildIntakeMessage(payload.input, payload.summary)
-    chat.sendMessage(message)
+    // Send as plain string - SDK 5 accepts both string and message object
+    chat.sendMessage(message as any)
   }
 
   const handleMealPlanRequest = async () => {
