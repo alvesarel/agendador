@@ -5,6 +5,7 @@ export const runtime = 'edge'
 
 export async function POST(req: Request) {
   try {
+    console.log('[Analyze API] Starting image analysis...')
     const formData = await req.formData()
 
     const weight = parseFloat(formData.get('weight') as string)
@@ -13,7 +14,15 @@ export async function POST(req: Request) {
     const currentPhotos = formData.getAll('currentPhotos') as File[]
     const goalPhotos = formData.getAll('goalPhotos') as File[]
 
+    console.log('[Analyze API] Received data:', {
+      weight,
+      height,
+      currentPhotosCount: currentPhotos.length,
+      goalPhotosCount: goalPhotos.length
+    })
+
     // Convert images to base64 for Gemini 2.5 Pro
+    console.log('[Analyze API] Converting current photos to base64...')
     const currentImageData = await Promise.all(
       currentPhotos.map(async (file) => {
         const bytes = await file.arrayBuffer()
@@ -26,6 +35,7 @@ export async function POST(req: Request) {
       })
     )
 
+    console.log('[Analyze API] Converting goal photos to base64...')
     const goalImageData = await Promise.all(
       goalPhotos.map(async (file) => {
         const bytes = await file.arrayBuffer()
@@ -38,7 +48,10 @@ export async function POST(req: Request) {
       })
     )
 
+    console.log('[Analyze API] Images converted successfully')
+
     // Generate comprehensive analysis using Gemini 2.5 Pro vision
+    console.log('[Analyze API] Calling Gemini 2.5 Pro vision model...')
     const result = await generateText({
       model: visionModel,
       system: systemPrompts.vision,
@@ -77,6 +90,9 @@ Seja empática, motivadora e profissional na sua análise.`
       temperature: 0.7
     })
 
+    console.log('[Analyze API] Analysis completed successfully')
+    console.log('[Analyze API] Token usage:', result.usage)
+
     return Response.json({
       analysis: result.text,
       weight,
@@ -84,7 +100,20 @@ Seja empática, motivadora e profissional na sua análise.`
       usage: result.usage
     })
   } catch (error) {
-    console.error('Vision analysis error:', error)
-    return new Response('Erro ao processar análise visual', { status: 500 })
+    console.error('[Analyze API] ERROR:', error)
+    console.error('[Analyze API] Error details:', {
+      message: error instanceof Error ? error.message : 'Unknown error',
+      stack: error instanceof Error ? error.stack : undefined,
+      errorType: error?.constructor?.name
+    })
+
+    const errorMessage = error instanceof Error ? error.message : 'Erro desconhecido'
+    return Response.json(
+      {
+        error: 'Erro ao processar análise visual',
+        details: errorMessage
+      },
+      { status: 500 }
+    )
   }
 }

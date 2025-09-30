@@ -51,10 +51,13 @@ export default function Home() {
       })
 
       if (!response.ok) {
-        throw new Error('Falha na análise visual')
+        const errorData = await response.json().catch(() => ({}))
+        console.error('[Frontend] API error response:', errorData)
+        throw new Error(errorData.details || 'Falha na análise visual')
       }
 
       const data = await response.json()
+      console.log('[Frontend] Analysis received successfully')
 
       setUserData({
         weight: payload.weight,
@@ -66,8 +69,9 @@ export default function Home() {
       const message = buildAnalysisMessage(payload.weight, payload.height, data.analysis)
       chat.sendMessage(message as any)
     } catch (error) {
-      console.error('Error analyzing photos:', error)
-      alert('Erro ao analisar imagens. Tente novamente.')
+      console.error('[Frontend] Error analyzing photos:', error)
+      const errorMessage = error instanceof Error ? error.message : 'Erro desconhecido'
+      alert(`Erro ao analisar imagens: ${errorMessage}\n\nTente novamente.`)
     } finally {
       setIsAnalyzing(false)
     }

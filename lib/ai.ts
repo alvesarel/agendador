@@ -1,12 +1,17 @@
-import { google } from '@ai-sdk/google'
-import { openai } from '@ai-sdk/openai'
+import { createGateway } from 'ai'
 
-// AI SDK with latest models (Gemini 2.5, GPT-5)
-// Using direct provider instances with GEMINI_API_KEY and OPENAI_API_KEY
-// Falls back to AI Gateway if AI_GATEWAY_API_KEY is set
-export const visionModel = google('gemini-2.5-pro')
-export const chatModel = google('gemini-2.5-flash')
-export const plannerModel = openai('gpt-5')
+// Vercel AI Gateway configuration (unified access to all models)
+// Automatically uses AI_GATEWAY_API_KEY from environment
+const gateway = createGateway({
+  apiKey: process.env.AI_GATEWAY_API_KEY || '',
+  baseURL: 'https://ai-gateway.vercel.sh/v1/ai',
+})
+
+// Models accessed through Vercel AI Gateway
+// Format: 'provider/model-name'
+export const visionModel = gateway('google/gemini-2.5-pro')
+export const chatModel = gateway('google/gemini-2.5-flash')
+export const plannerModel = gateway('openai/gpt-5')
 
 // System prompts for different contexts
 export const systemPrompts = {
