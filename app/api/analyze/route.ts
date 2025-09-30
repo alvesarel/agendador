@@ -49,18 +49,18 @@ export async function POST(req: Request) {
     )
 
     console.log('[Analyze API] Images converted successfully')
+    console.log('[Analyze API] Total images to process:', currentImageData.length + goalImageData.length)
 
     // Generate comprehensive analysis using Gemini 2.5 Pro vision
     console.log('[Analyze API] Calling Gemini 2.5 Pro vision model...')
     const result = await generateText({
       model: visionModel,
-      system: systemPrompts.vision,
       messages: [{
         role: 'user',
         content: [
           {
             type: 'text',
-            text: `Analise detalhadamente estas imagens de composição corporal.
+            text: `Você é um especialista em análise de composição corporal. Analise estas imagens:
 
 **Dados fornecidos:**
 - Peso atual: ${weight}kg
@@ -91,17 +91,30 @@ Seja empática, motivadora e profissional na sua análise.`
     })
 
     console.log('[Analyze API] Analysis completed successfully')
-    console.log('[Analyze API] Result object:', {
-      hasText: !!result.text,
-      textLength: result.text?.length,
-      textPreview: result.text?.substring(0, 100),
-      usage: result.usage,
-      fullResult: result
-    })
+    console.log('[Analyze API] Result keys:', Object.keys(result))
+    console.log('[Analyze API] Result text exists:', !!result.text)
+    console.log('[Analyze API] Result text length:', result.text?.length)
+    console.log('[Analyze API] Result usage:', result.usage)
+
+    // Check for safety ratings or finish reason
+    if ('finishReason' in result) {
+      console.log('[Analyze API] Finish reason:', (result as any).finishReason)
+    }
+    if ('response' in result) {
+      console.log('[Analyze API] Raw response:', (result as any).response)
+    }
 
     if (!result.text || result.text.trim().length === 0) {
       console.error('[Analyze API] Empty response from AI model')
+      console.error('[Analyze API] Full result keys:', Object.keys(result))
       console.error('[Analyze API] Full result:', JSON.stringify(result, null, 2))
+
+      // Check if it was blocked by safety filters
+      const finishReason = (result as any).finishReason
+      if (finishReason && finishReason !== 'stop') {
+        throw new Error(`Gemini bloqueou a resposta. Motivo: ${finishReason}`)
+      }
+
       throw new Error('O modelo de IA retornou uma resposta vazia')
     }
 
