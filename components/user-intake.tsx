@@ -105,10 +105,10 @@ export function UserIntake({ onSubmit }: UserIntakeProps) {
           />
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div className="space-y-4">
           <div className="space-y-2">
             <label className="text-sm font-medium text-gray-700">Sexo</label>
-            <div className="flex gap-3">
+            <div className="grid grid-cols-2 gap-3">
               {[
                 { label: 'Feminino', value: 'female' },
                 { label: 'Masculino', value: 'male' }
@@ -117,7 +117,7 @@ export function UserIntake({ onSubmit }: UserIntakeProps) {
                   key={option.value}
                   type="button"
                   onClick={() => handleChange('gender', option.value as UserMetricsInput['gender'])}
-                  className={`flex-1 rounded-lg border px-3 py-2 text-sm font-medium transition-colors ${
+                  className={`rounded-lg border px-3 py-2 text-sm font-medium transition-colors ${
                     form.gender === option.value
                       ? 'border-blue-600 bg-blue-50 text-blue-700'
                       : 'border-gray-200 hover:border-gray-300'
@@ -141,7 +141,7 @@ export function UserIntake({ onSubmit }: UserIntakeProps) {
                   key={option.value}
                   type="button"
                   onClick={() => handleChange('goal', option.value as UserMetricsInput['goal'])}
-                  className={`rounded-lg border px-3 py-2 text-sm font-medium transition-colors ${
+                  className={`rounded-lg border px-2 py-2 text-xs sm:text-sm font-medium transition-colors ${
                     form.goal === option.value
                       ? 'border-blue-600 bg-blue-50 text-blue-700'
                       : 'border-gray-200 hover:border-gray-300'
