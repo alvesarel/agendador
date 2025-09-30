@@ -91,7 +91,19 @@ Seja empática, motivadora e profissional na sua análise.`
     })
 
     console.log('[Analyze API] Analysis completed successfully')
-    console.log('[Analyze API] Token usage:', result.usage)
+    console.log('[Analyze API] Result object:', {
+      hasText: !!result.text,
+      textLength: result.text?.length,
+      textPreview: result.text?.substring(0, 100),
+      usage: result.usage,
+      fullResult: result
+    })
+
+    if (!result.text || result.text.trim().length === 0) {
+      console.error('[Analyze API] Empty response from AI model')
+      console.error('[Analyze API] Full result:', JSON.stringify(result, null, 2))
+      throw new Error('O modelo de IA retornou uma resposta vazia')
+    }
 
     return Response.json({
       analysis: result.text,
