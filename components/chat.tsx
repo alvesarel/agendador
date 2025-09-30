@@ -1,24 +1,14 @@
 'use client'
 
+import type { UseChatHelpers } from '@ai-sdk/react'
 import { Send, Loader2, Camera, Utensils } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 import { CTA } from './cta'
 import { MealPlanDisplay } from './meal-plan-display'
 import type { MealPlan } from '@/lib/meal-plan'
 
-// AI SDK 5 useChat return type
-interface ChatHelpers {
-  messages: Array<{
-    id: string
-    role: 'user' | 'assistant' | 'system'
-    content: string
-  }>
-  sendMessage: (message: string) => void
-  status: 'ready' | 'submitted' | 'streaming' | 'error'
-}
-
 interface ChatProps {
-  chat: ChatHelpers
+  chat: UseChatHelpers
   mealPlan: MealPlan | null
   onRequestMealPlan: () => void
   isGeneratingMealPlan: boolean
@@ -36,10 +26,22 @@ export function Chat({
   const [input, setInput] = useState('')
   const isLoading = status === 'submitted' || status === 'streaming'
 
+  // Helper to safely get message content
+  const getMessageContent = (message: any): string => {
+    if (typeof message.content === 'string') return message.content
+    if (Array.isArray(message.content)) {
+      return message.content
+        .filter((part: any) => part.type === 'text')
+        .map((part: any) => part.text)
+        .join(' ')
+    }
+    return ''
+  }
+
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     if (!input.trim()) return
-    sendMessage(input)
+    sendMessage(input as any)
     setInput('')
   }
 
@@ -93,7 +95,7 @@ export function Chat({
                   : 'bg-white border border-gray-200'
               }`}
             >
-              <p className="whitespace-pre-wrap">{message.content}</p>
+              <p className="whitespace-pre-wrap">{getMessageContent(message)}</p>
             </div>
           </div>
         ))}
