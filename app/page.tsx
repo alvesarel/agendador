@@ -129,27 +129,29 @@ export default function Home() {
   return (
     <main className="flex flex-col h-screen bg-gray-50">
       <Header />
-      <div className="flex-1 flex items-center justify-center px-4 py-6 overflow-hidden">
+      <div className="flex-1 overflow-y-auto px-4 py-6">
         {!userData && !isAnalyzing && (
-          <div className="w-full max-w-2xl">
+          <div className="w-full max-w-2xl mx-auto">
             <UserIntake onSubmit={handleIntakeSubmit} />
           </div>
         )}
 
         {isAnalyzing && (
-          <div className="bg-white border border-gray-200 rounded-xl shadow-sm p-8 text-center max-w-md">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">
-              Analisando suas imagens...
-            </h3>
-            <p className="text-sm text-gray-600">
-              Estamos usando IA avançada para comparar seu físico atual com seu objetivo e criar uma análise personalizada.
-            </p>
+          <div className="flex items-center justify-center min-h-full">
+            <div className="bg-white border border-gray-200 rounded-xl shadow-sm p-8 text-center max-w-md">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                Analisando suas imagens...
+              </h3>
+              <p className="text-sm text-gray-600">
+                Estamos usando IA avançada para comparar seu físico atual com seu objetivo e criar uma análise personalizada.
+              </p>
+            </div>
           </div>
         )}
 
         {userData && !isAnalyzing && (
-          <div className="w-full h-full max-w-6xl">
+          <div className="w-full h-full max-w-6xl mx-auto flex flex-col">
             <Chat
               chat={chat as any}
               mealPlan={mealPlan}

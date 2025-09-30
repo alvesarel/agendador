@@ -93,7 +93,7 @@ export function UserIntake({ onSubmit }: UserIntakeProps) {
   }
 
   return (
-    <section className="bg-white border border-gray-200 rounded-xl shadow-sm p-6 space-y-6">
+    <section className="bg-white border border-gray-200 rounded-xl shadow-sm p-6 space-y-6 mb-6">
       <header className="space-y-1">
         <h2 className="text-xl font-semibold text-gray-900">Comece sua análise</h2>
         <p className="text-sm text-gray-600">
