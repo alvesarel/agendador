@@ -5,11 +5,11 @@ import { openai } from '@ai-sdk/openai'
 // In production on Vercel, these will use AI Gateway automatically via OIDC
 // Locally, we need GEMINI_API_KEY and OPENAI_API_KEY set
 
-export const visionModel = google('gemini-2.0-flash-exp', {
+export const visionModel = google('gemini-2.5-pro-latest', {
   apiKey: process.env.GEMINI_API_KEY
 })
 
-export const chatModel = google('gemini-2.0-flash-exp', {
+export const chatModel = google('gemini-2.5-flash-latest', {
   apiKey: process.env.GEMINI_API_KEY
 })
 
