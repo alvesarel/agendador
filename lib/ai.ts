@@ -1,11 +1,12 @@
 import { google } from '@ai-sdk/google'
 import { openai } from '@ai-sdk/openai'
 
-// AI SDK 4 model configuration
-// Models are configured with provider instances
-export const visionModel = google('gemini-2.0-flash-exp')
-export const chatModel = google('gemini-2.0-flash-exp')
-export const plannerModel = openai('gpt-4o')
+// AI SDK with latest models (Gemini 2.5, GPT-5)
+// Using direct provider instances with GEMINI_API_KEY and OPENAI_API_KEY
+// Falls back to AI Gateway if AI_GATEWAY_API_KEY is set
+export const visionModel = google('gemini-2.5-pro')
+export const chatModel = google('gemini-2.5-flash')
+export const plannerModel = openai('gpt-5')
 
 // System prompts for different contexts
 export const systemPrompts = {
