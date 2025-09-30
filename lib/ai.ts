@@ -1,29 +1,11 @@
-import { google } from '@ai-sdk/google'
-import { openai } from '@ai-sdk/openai'
+// AI SDK 5 with Vercel AI Gateway integration
+// Gateway provides unified access to multiple AI models with automatic failover
 
-// AI SDK 5 uses AI Gateway by default when using model strings
-// Falls back to direct provider instances if AI_GATEWAY_API_KEY is not set
-
-const useGateway = !!process.env.AI_GATEWAY_API_KEY
-
-// Model configurations: AI Gateway (primary) with direct provider fallback
-export const visionModel = useGateway
-  ? 'google/gemini-2.5-flash'
-  : google('gemini-2.5-flash', {
-      apiKey: process.env.GEMINI_API_KEY
-    })
-
-export const chatModel = useGateway
-  ? 'google/gemini-2.5-flash'
-  : google('gemini-2.5-flash', {
-      apiKey: process.env.GEMINI_API_KEY
-    })
-
-export const plannerModel = useGateway
-  ? 'openai/gpt-5'
-  : openai('gpt-5', {
-      apiKey: process.env.OPENAI_API_KEY
-    })
+// Model configurations using AI Gateway
+// When AI_GATEWAY_API_KEY is set, AI SDK automatically routes through the gateway
+export const visionModel = 'google/gemini-2.5-flash'
+export const chatModel = 'google/gemini-2.5-flash'
+export const plannerModel = 'openai/gpt-5'
 
 // System prompts for different contexts
 export const systemPrompts = {
