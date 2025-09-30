@@ -10,6 +10,7 @@ You need to add API keys to Vercel environment variables for the application to 
 
 ### 1. GEMINI_API_KEY (Required - Primary Model)
 - Get your API key from: https://makersuite.google.com/app/apikey
+- **Alternative name**: You can also use `GOOGLE_GENERATIVE_AI_API_KEY`
 - This is used for:
   - Vision analysis (comparing current vs goal photos)
   - Chat conversations

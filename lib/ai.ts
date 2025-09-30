@@ -1,21 +1,23 @@
-import { google } from '@ai-sdk/google'
-import { openai } from '@ai-sdk/openai'
+import { createGoogleGenerativeAI } from '@ai-sdk/google'
+import { createOpenAI } from '@ai-sdk/openai'
 
-// Use direct provider access with API keys
-// In production on Vercel, these will use AI Gateway automatically via OIDC
-// Locally, we need GEMINI_API_KEY and OPENAI_API_KEY set
+// Create provider instances with API keys
+// These will automatically use environment variables if not provided:
+// - GOOGLE_GENERATIVE_AI_API_KEY (or GEMINI_API_KEY as fallback)
+// - OPENAI_API_KEY
 
-export const visionModel = google('gemini-2.5-pro-latest', {
-  apiKey: process.env.GEMINI_API_KEY
+const google = createGoogleGenerativeAI({
+  apiKey: process.env.GEMINI_API_KEY || process.env.GOOGLE_GENERATIVE_AI_API_KEY
 })
 
-export const chatModel = google('gemini-2.5-flash-latest', {
-  apiKey: process.env.GEMINI_API_KEY
-})
-
-export const plannerModel = openai('gpt-5', {
+const openai = createOpenAI({
   apiKey: process.env.OPENAI_API_KEY
 })
+
+// Model instances
+export const visionModel = google('gemini-2.5-pro-latest')
+export const chatModel = google('gemini-2.5-flash-latest')
+export const plannerModel = openai('gpt-5')
 
 // System prompts for different contexts
 export const systemPrompts = {
