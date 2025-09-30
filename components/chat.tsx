@@ -1,6 +1,6 @@
 'use client'
 
-import type { UseChatHelpers } from 'ai/rsc'
+import type { UseChatHelpers } from '@ai-sdk/react'
 import { Send, Loader2, Camera, Utensils } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 import { CTA } from './cta'

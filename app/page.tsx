@@ -7,7 +7,7 @@ import { PrivacyNotice } from '@/components/privacy-notice'
 import { UserIntake } from '@/components/user-intake'
 import type { MetricsResult, UserMetricsInput } from '@/lib/calculations'
 import type { MealPlan } from '@/lib/meal-plan'
-import { useChat } from 'ai/rsc'
+import { useChat } from '@ai-sdk/react'
 import { useState } from 'react'
 
 export default function Home() {
