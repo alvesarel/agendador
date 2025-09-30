@@ -13,7 +13,7 @@ export const chatModel = google('gemini-2.5-flash-latest', {
   apiKey: process.env.GEMINI_API_KEY
 })
 
-export const plannerModel = openai('gpt-4o', {
+export const plannerModel = openai('gpt-5', {
   apiKey: process.env.OPENAI_API_KEY
 })
 

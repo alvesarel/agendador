@@ -60,10 +60,10 @@ If you want to test locally:
 
 - **Vision Analysis**: Google Gemini 2.5 Pro (latest)
 - **Chat**: Google Gemini 2.5 Flash (latest)
-- **Meal Plans**: OpenAI GPT-4o
+- **Meal Plans**: OpenAI GPT-5
 
 These models were chosen for:
-- Superior multimodal capabilities (vision + text)
+- Superior multimodal capabilities (vision + text) - Gemini 2.5
 - Latest Gemini 2.5 generation with improved reasoning
-- Cost-effectiveness
-- Speed and reliability
+- GPT-5 for advanced meal planning with best reasoning capabilities
+- Cost-effectiveness and reliability
