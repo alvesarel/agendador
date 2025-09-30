@@ -67,7 +67,7 @@ export function Chat({
   }
 
   return (
-    <div className="flex-1 flex flex-col max-w-4xl mx-auto w-full">
+    <div className="h-full flex flex-col bg-white border border-gray-200 rounded-xl shadow-sm">
       {/* Messages Area */}
       <div className="flex-1 overflow-auto p-4 space-y-4">
         {messages.length === 0 && (
@@ -134,7 +134,7 @@ export function Chat({
       {/* Input Area */}
       <form
         onSubmit={handleSubmit}
-        className="border-t border-gray-200 bg-white p-4"
+        className="border-t border-gray-200 p-4 shrink-0"
       >
         {/* Meal Plan Request Button */}
         {hasUserData && !mealPlan && messages.length >= 2 && (

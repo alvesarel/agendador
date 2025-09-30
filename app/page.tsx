@@ -123,31 +123,29 @@ export default function Home() {
   }
 
   return (
-    <main className="flex-1 flex flex-col bg-gray-50">
+    <main className="flex flex-col h-screen bg-gray-50">
       <Header />
-      <div className="mx-auto flex w-full max-w-6xl flex-1 flex-col gap-6 px-4 py-6 lg:flex-row">
+      <div className="flex-1 flex items-center justify-center px-4 py-6 overflow-hidden">
         {!userData && !isAnalyzing && (
-          <div className="w-full lg:w-[360px] lg:shrink-0">
+          <div className="w-full max-w-2xl">
             <UserIntake onSubmit={handleIntakeSubmit} />
           </div>
         )}
 
         {isAnalyzing && (
-          <div className="flex-1 flex items-center justify-center min-h-[520px]">
-            <div className="bg-white border border-gray-200 rounded-xl shadow-sm p-8 text-center max-w-md">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                Analisando suas imagens...
-              </h3>
-              <p className="text-sm text-gray-600">
-                Estamos usando IA avançada para comparar seu físico atual com seu objetivo e criar uma análise personalizada.
-              </p>
-            </div>
+          <div className="bg-white border border-gray-200 rounded-xl shadow-sm p-8 text-center max-w-md">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+            <h3 className="text-lg font-semibold text-gray-900 mb-2">
+              Analisando suas imagens...
+            </h3>
+            <p className="text-sm text-gray-600">
+              Estamos usando IA avançada para comparar seu físico atual com seu objetivo e criar uma análise personalizada.
+            </p>
           </div>
         )}
 
         {userData && !isAnalyzing && (
-          <div className="flex-1 min-h-[520px]">
+          <div className="w-full h-full max-w-6xl">
             <Chat
               chat={chat as any}
               mealPlan={mealPlan}
