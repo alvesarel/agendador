@@ -81,7 +81,7 @@ export default function Home() {
 
         <div className="flex-1 min-h-[520px]">
           <Chat
-            chat={chat}
+            chat={chat as any}
             mealPlan={mealPlan}
             onRequestMealPlan={handleMealPlanRequest}
             isGeneratingMealPlan={isGeneratingMealPlan}
