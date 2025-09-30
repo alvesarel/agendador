@@ -15,8 +15,9 @@ const openai = createOpenAI({
 })
 
 // Model instances
-export const visionModel = google('gemini-2.5-pro-latest')
-export const chatModel = google('gemini-2.5-flash-latest')
+// Gemini 2.5 models (stable versions without -latest suffix)
+export const visionModel = google('gemini-2.5-pro')
+export const chatModel = google('gemini-2.5-flash')
 export const plannerModel = openai('gpt-5')
 
 // System prompts for different contexts

@@ -59,9 +59,9 @@ If you want to test locally:
 
 ## Current Model Configuration
 
-- **Vision Analysis**: Google Gemini 2.5 Pro (latest)
-- **Chat**: Google Gemini 2.5 Flash (latest)
-- **Meal Plans**: OpenAI GPT-5
+- **Vision Analysis**: `gemini-2.5-pro` (Google Gemini 2.5 Pro)
+- **Chat**: `gemini-2.5-flash` (Google Gemini 2.5 Flash)
+- **Meal Plans**: `gpt-5` (OpenAI GPT-5)
 
 These models were chosen for:
 - Superior multimodal capabilities (vision + text) - Gemini 2.5
