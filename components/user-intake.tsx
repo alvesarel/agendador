@@ -155,31 +155,24 @@ export function UserIntake({ onSubmit }: UserIntakeProps) {
         </div>
 
         <div className="space-y-2">
-          <label className="text-sm font-medium text-gray-700">Nível de atividade</label>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <label htmlFor="activityLevel" className="text-sm font-medium text-gray-700">
+            Nível de atividade
+          </label>
+          <select
+            id="activityLevel"
+            value={form.activityLevel}
+            onChange={(e) => handleChange('activityLevel', e.target.value as ActivityLevel)}
+            className="w-full rounded-lg border border-gray-200 px-3 py-2 text-gray-900 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200"
+          >
             {(Object.keys(ACTIVITY_LEVELS) as ActivityLevel[]).map((level) => {
               const option = ACTIVITY_LEVELS[level]
               return (
-                <button
-                  key={level}
-                  type="button"
-                  onClick={() => handleChange('activityLevel', level)}
-                  className={`rounded-lg border px-4 py-3 text-left transition-colors ${
-                    form.activityLevel === level
-                      ? 'border-blue-600 bg-blue-50 text-blue-700'
-                      : 'border-gray-200 hover:border-gray-300'
-                  }`}
-                >
-                  <span className="block text-sm font-semibold">
-                    {option.title}
-                  </span>
-                  <span className="block text-xs text-gray-600">
-                    {option.description}
-                  </span>
-                </button>
+                <option key={level} value={level}>
+                  {option.title} - {option.description}
+                </option>
               )
             })}
-          </div>
+          </select>
         </div>
 
         <button
