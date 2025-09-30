@@ -9,11 +9,10 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@ai-sdk/google": "latest",
-    "@ai-sdk/openai": "latest",
-    "@ai-sdk/react": "latest",
-    "ai": "latest",
-    "@ai-sdk/provider": "latest",
+    "@ai-sdk/google": "^2.0.17",
+    "@ai-sdk/openai": "^2.0.14",
+    "@ai-sdk/react": "^1.0.17",
+    "ai": "^4.0.38",
     "lucide-react": "latest",
     "next": "^15.5.4",
     "react": "19.0.0-rc-65a56d0e-20241020",
