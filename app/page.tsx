@@ -29,6 +29,12 @@ export default function Home() {
     goalPhotos: File[]
   }) => {
     setIsAnalyzing(true)
+    console.log('[Frontend] Starting analysis with:', {
+      weight: payload.weight,
+      height: payload.height,
+      currentPhotosCount: payload.currentPhotos.length,
+      goalPhotosCount: payload.goalPhotos.length
+    })
 
     try {
       // Create FormData for image upload
@@ -44,11 +50,15 @@ export default function Home() {
         formData.append('goalPhotos', file)
       })
 
+      console.log('[Frontend] Sending request to /api/analyze...')
+
       // Call vision analysis API
       const response = await fetch('/api/analyze', {
         method: 'POST',
         body: formData
       })
+
+      console.log('[Frontend] Response status:', response.status, response.statusText)
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}))
@@ -57,24 +67,39 @@ export default function Home() {
       }
 
       const data = await response.json()
-      console.log('[Frontend] Analysis received successfully')
+      console.log('[Frontend] Response data:', data)
 
+      if (!data.analysis || typeof data.analysis !== 'string' || data.analysis.trim().length === 0) {
+        console.error('[Frontend] Invalid analysis data:', data)
+        throw new Error('Resposta da API não contém análise válida')
+      }
+
+      console.log('[Frontend] Valid analysis received, length:', data.analysis.length)
+
+      // Send analysis to chat FIRST
+      const message = buildAnalysisMessage(payload.weight, payload.height, data.analysis)
+      console.log('[Frontend] Sending message to chat...')
+      await chat.sendMessage(message as any)
+
+      // Only set userData after message is sent successfully
+      console.log('[Frontend] Setting user data...')
       setUserData({
         weight: payload.weight,
         height: payload.height,
         analysis: data.analysis
       })
 
-      // Send analysis to chat
-      const message = buildAnalysisMessage(payload.weight, payload.height, data.analysis)
-      chat.sendMessage(message as any)
+      console.log('[Frontend] Analysis flow completed successfully')
     } catch (error) {
       console.error('[Frontend] Error analyzing photos:', error)
       const errorMessage = error instanceof Error ? error.message : 'Erro desconhecido'
-      alert(`Erro ao analisar imagens: ${errorMessage}\n\nTente novamente.`)
-    } finally {
+      alert(`Erro ao analisar imagens: ${errorMessage}\n\nPor favor, verifique o console do navegador para mais detalhes e tente novamente.`)
+      // Don't set userData on error to stay on intake form
       setIsAnalyzing(false)
+      return
     }
+
+    setIsAnalyzing(false)
   }
 
   const handleMealPlanRequest = async () => {
